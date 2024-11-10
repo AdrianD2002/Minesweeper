@@ -1,0 +1,58 @@
+/* Ensure the body takes up the full viewport height */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Style the login button and position it in the top-right corner */
+a[href="login.html"] button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+/* Center the main container */
+div {
+    text-align: center;
+}
+
+.header {
+    background: #c8102e;
+}
+
+.main {
+    background-color: white;
+}
+
+/* Style the title */
+h1 {
+    font-size: 50px;
+    margin-bottom: 20px;
+    color: white;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    -webkit-text-stroke: 1px #13294b;
+}
+
+/* Style all buttons */
+button {
+    padding: 15px 30px;
+    font-size: 18px;
+    margin: 10px 0; /* adds space between stacked buttons */
+    background-color: #13294b; /* blue color for buttons */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+button:hover {
+    background-color: #0056b3; /* darker blue on hover */
+}
