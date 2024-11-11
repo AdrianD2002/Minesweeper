@@ -7,7 +7,7 @@ This website demonstration can be tried with XAMPP running an Apache Server:
 2. Locate your XAMPP install (typically C:/xampp/).
 3. Open the /htdocs/ folder and do either of the following:
 
-   a) If cloning with git, open your terminal here and run "git clone https://github.com/AdrianD2002/Minesweeper.git"
+   a) If cloning with git, open your terminal here and run `git clone https://github.com/AdrianD2002/Minesweeper.git`
    
    b) If installing with the ZIP file, unzip the contents into /htdocs/Minesweeper.
 
