@@ -1,8 +1,45 @@
+.author {
+    display: flex;
+    width: 70%;
+    align-content: center;
+    margin: auto;
+}
+
+.author_desc {
+    text-align: left;
+    padding: 10px; 
+    font-size: 16pt;
+}
+
+.author_desc h2 {
+    color: #13294b;
+    text-decoration: underline;
+}
+
+.author_image {
+    box-shadow: 2px 3px 5px rgba(0,0,0,0.5);
+}
+.author_image:hover {
+    box-shadow: 5px 6px 10px rgba(0,0,0,0.5);
+    -webkit-transform: scale(1.5) rotateZ(5deg);
+    -ms-transform: scale(1.5) rotateZ(5deg);
+    transform: scale(1.5) rotateZ(5deg);
+    transition:all 0.3s ease;
+}
+.author_images:not(:hover) {
+    box-shadow: 2px 3px 5px rgba(0,0,0,0.5);
+    -webkit-transform: scale(1.0);
+    -ms-transform: scale(1.0);
+    transform: scale(1.0);
+    transition:all 0.3s ease;
+}
+
 body {
     justify-content: center;
     align-items: center;
     height: 100%;
     margin: 0;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 button {
@@ -37,6 +74,7 @@ button:not(:hover) {
 div {
     text-align: center;
     margin: 0px
+
 }
 
 footer {
@@ -72,6 +110,19 @@ header > a {
     top: 20px;
     right: 20px;
     padding: 10px 20px;
+}
+
+hr {
+    width: 70%;
+}
+
+.instructions {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    text-align: left;
+    font-weight: bold;
+    list-style: circle;
+    font-size: 25px;
+    
 }
 
 #login {
