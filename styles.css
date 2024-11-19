@@ -25,8 +25,10 @@
     -ms-transform: scale(1.5) rotateZ(5deg);
     transform: scale(1.5) rotateZ(5deg);
     transition:all 0.3s ease;
+    z-index: 1000;
 }
-.author_images:not(:hover) {
+
+.author_image:not(:hover) {
     box-shadow: 2px 3px 5px rgba(0,0,0,0.5);
     -webkit-transform: scale(1.0);
     -ms-transform: scale(1.0);
