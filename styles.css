@@ -36,6 +36,21 @@
     transition:all 0.3s ease;
 }
 
+#board {
+    border: 2px solid black;
+    border-collapse: collapse;
+    margin: auto;
+    margin-top: 20px;
+}
+
+#board td {
+    border: 2px solid black;
+    width: 50px;
+    height: 50px;
+    background-image: url("assets/grass.jpg");
+    background-size: 50px;
+}
+
 body {
     justify-content: center;
     align-items: center;

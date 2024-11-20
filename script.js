@@ -7,18 +7,28 @@ function GameInit() {
 }
 
 function makeTable(dimension) {
-    str = '<table>'
+    let str = '<table id="board">';
 
     for (let i = 0; i < dimension; i++) { // height
-        str += '<tr>'
+        str += '<tr>';
 
         for (let j = 0; j < dimension; j++) { // width
-            str += '<td><p>test</td>'
+            str += '<td '
+                + 'id="' + i + ',' + j + '" '
+                + 'onclick="Flag(' + i + ',' + j + ')" '
+                + 'oncontextmenu="Flag(event, ' + i + ', ' + j + ')">'
+                + '</td>';
         }
 
-        str += '</tr>'
+        str += '</tr>';
     }
 
     str += '</table>'
     document.getElementById("gameDisplay").innerHTML = str;
+}
+
+function Flag(event,x,y){
+    event.preventDefault();
+    const cell = document.getElementById(x + ',' + y);
+    cell.innerHTML = '<img src="assets/lily.webp" alt="Flag" height="46px">';
 }
