@@ -49,6 +49,7 @@
     height: 30px;
     background-image: url("assets/grass.jpg");
     background-size: 30px;
+    color: white;
 }
 
 body {
