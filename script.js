@@ -146,15 +146,14 @@ class Minesweeper {
             // Increment the number of mines each of its neighbors has
             for (let j = x - 1; j <= x + 1; j++) {
                 // Skip row if the mine is against the top or bottom boundary
-                if (j < 0 || j > 9) { continue; }
+                if (j < 0 || j > this.dimension - 1) { continue; }
 
                 for (let k = y - 1; k <= y + 1; k++) {
                     // Skip column if the mine is against the left or right boundary
-                    if (k < 0 || k > 9) { continue; }
+                    if (k < 0 || k >  this.dimension - 1) { continue; }
                     
-                    
-                    let currCount = this.listCells[j][k].GetAdjacentMines();
-                    this.listCells[j][k].SetAdjacentMines(++currCount); // Increment
+                    let currCount = this.listCells[j][k].GetAdjacentMines() + 1;
+                    this.listCells[j][k].SetAdjacentMines(currCount);
                     if (x == k && y == j) { 
                         continue; 
                     }
