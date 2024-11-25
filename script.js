@@ -16,23 +16,6 @@ class Cell {
 
     }
 
-    StartTimer() {
-        if(this.timerStarted = true) {
-            return;
-        }
-        
-        this.timerStarted = true;
-
-        this.timerInterval = setInterval(() => {
-            this.timerElapsed++;
-            document.getElementById('timer').textContent = this.timeElapsed;
-        }, 1000);
-    }
-
-    Reveal() {
-        this.isRevealed = true;
-    }
-
     ToggleFlag() {
         if (this.isRevealed) {
             this.isFlagged = false;
@@ -63,19 +46,18 @@ class Cell {
     }
     
     DigCell() {
-        if (!this.isRevealed && !this.isFlagged) { // Check if the cell is not already revealed
-            this.Reveal();
-            const cell = document.getElementById(this.x + ',' + this.y);
-            if (this.GetIsMine()) {
-                cell.style = 'background-image: url("assets/tnt.webp")'; // Show mine if the cell is a mine
-                alert("Game Over!"); 
-            } else {
-                cell.style = 'background-image: url("assets/stone.webp")'; 
-            }
-        }
-    }
+        this.isRevealed = true
     
-} 
+        const cell = document.getElementById(this.x + ',' + this.y);
+        if (this.GetIsMine()) {
+            cell.style = 'background-image: url("assets/tnt.webp")'; // Show mine if the cell is a mine
+            alert("Game Over!"); 
+        } else {
+            cell.style = 'background-image: url("assets/stone.webp")'; 
+            cell.innerHTML = this.#adjacentMines == 0 ? '' : this.#adjacentMines;
+        }
+    } 
+}
 
 class Minesweeper {
     constructor(dimension = 0, numMines = 0) {
@@ -84,9 +66,48 @@ class Minesweeper {
         this.listCells = [];
     }
 
+    StartTimer() {
+        if(this.timerStarted = true) {
+            return;
+        }
+        
+        this.timerStarted = true;
+
+        this.timerInterval = setInterval(() => {
+            this.timerElapsed++;
+            document.getElementById('timer').textContent = this.timeElapsed;
+        }, 1000);
+    }
+
     Dig(x,y) {
+        if (this.listCells[x][y].isFlagged) {
+            return;
+        }
+        if (this.listCells[x][y].isRevealed) {
+            return;
+        }
+
         this.StartTimer();
         this.listCells[x][y].DigCell();
+
+        if (this.listCells[x][y].GetAdjacentMines() != 0) {
+            return;
+        }
+
+        // Recursively dig adjacent cells with no adjacent mines
+        for (let i = x - 1; i <= x + 1; i++) {
+            // Skip row if the cell is against the top or bottom boundary
+            if (i < 0 || i > this.dimension - 1) { continue; }
+            for (let j = y - 1; j <= y + 1; j++) {
+                // Skip column if the cell is against the left or right boundary
+                if (j < 0 || j > this.dimension - 1) { continue; }
+                // Skip if its the current cell
+                if (i == x && j == x) { continue; }
+
+                console.log("Digging recursively:" + i + "," + j);
+                this.Dig(i,j);
+            }
+        }
     }
 
     MakeGrid() {
@@ -151,19 +172,9 @@ class Minesweeper {
                 for (let k = y - 1; k <= y + 1; k++) {
                     // Skip column if the mine is against the left or right boundary
                     if (k < 0 || k >  this.dimension - 1) { continue; }
-                    
                     let currCount = this.listCells[j][k].GetAdjacentMines() + 1;
                     this.listCells[j][k].SetAdjacentMines(currCount);
-
-                    if (this.listCells[j][k].GetIsMine()) { 
-                        document.getElementById(j + ',' + k).innerHTML = '';
-                    }
-                    else {
-                        document.getElementById(j + ',' + k).innerHTML = this.listCells[j][k].GetAdjacentMines();
-                    }   
-
                 }
-                
             }
         }
     }
