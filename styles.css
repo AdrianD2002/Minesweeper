@@ -95,6 +95,10 @@ div {
 
 }
 
+.flag {
+    height:21px;
+}
+
 footer {
     background-color: #13294b;
     text-align: center;

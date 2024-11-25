@@ -27,7 +27,7 @@ class Cell {
 
         this.isFlagged = !this.isFlagged;
         const cell = document.getElementById(this.x + ',' + this.y);
-        cell.innerHTML = this.isFlagged ? '<img src="assets/lily.webp" alt="Flag" height="25px">' : '';
+        cell.innerHTML = this.isFlagged ? '<img src="assets/flower' + Math.floor(Math.random() * 10 + 1) + '.png" alt="Flag" class="flag">' : '';
     }
 
     GetIsMine() {
@@ -35,9 +35,15 @@ class Cell {
     }
 
     SetIsMine(bool) {
-        console.log("SetIsMine" + bool);
+        console.log("SetIsMine " + bool);
         this.#isMine = bool;
-        document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
+        if (bool) {
+            document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
+        }
+        else {
+            document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/grass.jpg")'; // TODO: Remove when done debugging
+        }
+        
     }
 
     GetAdjacentMines () {
@@ -49,15 +55,18 @@ class Cell {
     }
     
     DigCell() {
-        this.isRevealed = true
+        this.isRevealed = true;
     } 
 }
 
 class Minesweeper {
+    firstDig = true;
+    firstDigCoords;
+    listCells = [];
+
     constructor(dimension = 0, numMines = 0) {
         this.dimension = dimension;
         this.numMines = numMines;
-        this.listCells = [];
     }
 
     StartTimer() {
@@ -88,14 +97,19 @@ class Minesweeper {
     }
 
     Dig(x,y,userInputted) {
-        if (this.listCells[x][y].isFlagged && userInputted) {
+        if (this.listCells[x][y].isFlagged && userInputted) { // Spot is flagged
             return;
         }
-        if (this.listCells[x][y].isRevealed) {
+        if (this.listCells[x][y].isRevealed) { // Spot is already revealed
             return;
         }
-        if (this.listCells[x][y].GetIsMine() && userInputted) {
+        if (this.listCells[x][y].GetIsMine() && userInputted) { // User clicks a mine
             this.GameOver();
+        }
+        if (this.firstDig) {
+            this.firstDig = false;
+            this.firstDigCoords = [x,y];
+            this.InitMines();
         }
 
         this.StartTimer();
@@ -173,15 +187,19 @@ class Minesweeper {
 
         console.log(this.listCells);
 
+    }
 
+    InitMines() {
         // Choose random positions to set as mines
         for (let i = 0; i < this.numMines; i++) {
             let x = Math.floor(Math.random() * this.dimension);
             let y = Math.floor(Math.random() * this.dimension);
     
             // Spot is already a mine; randomize again until a free spot is found
-            while (this.listCells[x][y].GetIsMine()) {
-                console.log("Mine already exists")
+            while (this.listCells[x][y].GetIsMine() 
+                    || (x >= this.firstDigCoords[0] - 1 && x <= this.firstDigCoords[0] + 1) 
+                    && (y >= this.firstDigCoords[1] - 1 && y <= this.firstDigCoords[1] + 1)
+                ) {
                 x = Math.floor(Math.random() * this.dimension);
                 y = Math.floor(Math.random() * this.dimension);
             }
@@ -211,7 +229,6 @@ class Minesweeper {
 }
 
 function GameInit() {
-    mines = [];
     document.getElementById("gameDisplay").innerHTML =
       '<h1>Select Difficulty</h1>'
     + '<button type="button" onclick="StartGame(10,10)" class="main_button">Easy (10x10, 10 mines)</button><br>'
