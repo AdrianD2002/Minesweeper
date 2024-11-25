@@ -79,8 +79,8 @@ class Minesweeper {
         }, 1000);
     }
 
-    Dig(x,y) {
-        if (this.listCells[x][y].isFlagged) {
+    Dig(x,y,userInputted) {
+        if (this.listCells[x][y].isFlagged && userInputted) {
             return;
         }
         if (this.listCells[x][y].isRevealed) {
@@ -88,6 +88,7 @@ class Minesweeper {
         }
 
         this.StartTimer();
+        this.listCells[x][y].isFlagged = false;
         this.listCells[x][y].DigCell();
 
         if (this.listCells[x][y].GetAdjacentMines() != 0) {
@@ -99,13 +100,13 @@ class Minesweeper {
             // Skip row if the cell is against the top or bottom boundary
             if (i < 0 || i > this.dimension - 1) { continue; }
             for (let j = y - 1; j <= y + 1; j++) {
+
                 // Skip column if the cell is against the left or right boundary
                 if (j < 0 || j > this.dimension - 1) { continue; }
                 // Skip if its the current cell
                 if (i == x && j == x) { continue; }
 
-                console.log("Digging recursively:" + i + "," + j);
-                this.Dig(i,j);
+                this.Dig(i,j,false);
             }
         }
     }
@@ -119,7 +120,7 @@ class Minesweeper {
             for (let j = 0; j < this.dimension; j++) { // width
                 str += '<td '
                     + 'id="' + i + ',' + j + '" '
-                    + 'onclick="game.Dig(' + i + ',' + j + ')" '
+                    + 'onclick="game.Dig(' + i + ',' + j + ',true)" '
                     + 'oncontextmenu="game.ToggleFlag(' + i + ', ' + j + ')">'
                     //+ i + ',' + j
                     + '</td>';
