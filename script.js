@@ -154,12 +154,14 @@ class Minesweeper {
                     
                     let currCount = this.listCells[j][k].GetAdjacentMines() + 1;
                     this.listCells[j][k].SetAdjacentMines(currCount);
-                    if (x == k && y == j) { 
-                        continue; 
+
+                    if (this.listCells[j][k].GetIsMine()) { 
+                        document.getElementById(j + ',' + k).innerHTML = '';
                     }
                     else {
                         document.getElementById(j + ',' + k).innerHTML = this.listCells[j][k].GetAdjacentMines();
                     }   
+
                 }
                 
             }
