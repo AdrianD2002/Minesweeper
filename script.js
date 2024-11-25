@@ -22,6 +22,9 @@ class Cell {
             return;
         }
 
+        let url = 'assets/flag' + Math.floor(Math.random() * 4 + 1) + '.ogg'
+        new Audio(url).play();
+
         this.isFlagged = !this.isFlagged;
         const cell = document.getElementById(this.x + ',' + this.y);
         cell.innerHTML = this.isFlagged ? '<img src="assets/lily.webp" alt="Flag" height="25px">' : '';
@@ -34,7 +37,7 @@ class Cell {
     SetIsMine(bool) {
         console.log("SetIsMine" + bool);
         this.#isMine = bool;
-        document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/tnt.webp")'; // TODO: Remove when done debugging
+        document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
     }
 
     GetAdjacentMines () {
@@ -47,15 +50,6 @@ class Cell {
     
     DigCell() {
         this.isRevealed = true
-    
-        const cell = document.getElementById(this.x + ',' + this.y);
-        if (this.GetIsMine()) {
-            cell.style = 'background-image: url("assets/tnt.webp")'; // Show mine if the cell is a mine
-            alert("Game Over!"); 
-        } else {
-            cell.style = 'background-image: url("assets/stone.webp")'; 
-            cell.innerHTML = this.#adjacentMines == 0 ? '' : this.#adjacentMines;
-        }
     } 
 }
 
@@ -79,6 +73,20 @@ class Minesweeper {
         }, 1000);
     }
 
+    GameOver() {
+        new Audio('assets/fuse.ogg').play();
+
+        for (let i = 0; i < this.dimension; i++) {
+            for (let j = 0; j < this.dimension; j++) {
+                if (this.listCells[i][j].GetIsMine()) {
+                    const cell = document.getElementById(i + ',' + j);
+                    cell.style = 'background-image: url("assets/tnt.webp")'; // Show mine if the cell is a mine
+                    
+                }
+            }
+        }
+    }
+
     Dig(x,y,userInputted) {
         if (this.listCells[x][y].isFlagged && userInputted) {
             return;
@@ -86,10 +94,25 @@ class Minesweeper {
         if (this.listCells[x][y].isRevealed) {
             return;
         }
+        if (this.listCells[x][y].GetIsMine() && userInputted) {
+            this.GameOver();
+        }
 
         this.StartTimer();
         this.listCells[x][y].isFlagged = false;
         this.listCells[x][y].DigCell();
+
+        if (!this.listCells[x][y].GetIsMine()) {
+            if (userInputted) {
+                let url = 'assets/dig' + Math.floor(Math.random() * 4 + 1) + '.ogg'
+                new Audio(url).play(); 
+            }
+            const cell = document.getElementById(x + ',' + y);
+            cell.style = 'background-image: url("assets/dirt.webp")';
+            let adjacentMines = this.listCells[x][y].GetAdjacentMines();
+            cell.innerHTML = adjacentMines == 0 ? '' : adjacentMines;
+        }
+
 
         if (this.listCells[x][y].GetAdjacentMines() != 0) {
             return;
