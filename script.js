@@ -38,10 +38,10 @@ class Cell {
         console.log("SetIsMine " + bool);
         this.#isMine = bool;
         if (bool) {
-            document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
+            //document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
         }
         else {
-            document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/grass.jpg")'; // TODO: Remove when done debugging
+            //document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/grass.jpg")'; // TODO: Remove when done debugging
         }
         
     }
@@ -106,6 +106,7 @@ class Minesweeper {
         if (this.listCells[x][y].GetIsMine() && userInputted) { // User clicks a mine
             this.GameOver();
         }
+
         if (this.firstDig) {
             this.firstDig = false;
             this.firstDigCoords = [x,y];
@@ -129,6 +130,7 @@ class Minesweeper {
 
 
         if (this.listCells[x][y].GetAdjacentMines() != 0) {
+            this.listCells[x][y].DigCell();
             return;
         }
 
@@ -140,8 +142,6 @@ class Minesweeper {
 
                 // Skip column if the cell is against the left or right boundary
                 if (j < 0 || j > this.dimension - 1) { continue; }
-                // Skip if its the current cell
-                if (i == x && j == x) { continue; }
 
                 this.Dig(i,j,false);
             }
