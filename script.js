@@ -1,4 +1,6 @@
-let game;
+var game;
+var httpRequest;
+
 class Cell {
     x;
     y;
@@ -228,6 +230,26 @@ class Minesweeper {
     }
 }
 
+function Init() {
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText);
+                }
+            }
+        }
+        catch (e) {
+            console.log("INIT ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`init_db.php`);
+    httpRequest.send();
+}
+
 function GameInit() {
     document.getElementById("gameDisplay").innerHTML =
       '<h1>Select Difficulty</h1>'
@@ -235,7 +257,6 @@ function GameInit() {
     + '<button type="button" onclick="StartGame(18,50)" class="main_button">Medium (18x18, 50 mines)</button><br>'
     + '<button type="button" onclick="StartGame(20,100)"class="main_button">Hard (20x20, 100 mines)</button><br>'
 }
-
 
 function StartGame(dimension, numMines) {
     game = new Minesweeper(dimension, numMines);
