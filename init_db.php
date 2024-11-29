@@ -1,5 +1,5 @@
 <?php
-    echo "[INIT DB] Running database initialization script.\n";
+    echo "[INIT DB] Checking for database.\n";
 
     $servername = "localhost"; // default server name
     $username = "csci130"; // user name that you created
@@ -36,7 +36,7 @@
 
         $sql .= "CREATE TABLE Games (
             id INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            userID INT(10) NOT NULL,
+            playerID INT(10) NOT NULL,
             difficulty INT(1) NOT NULL,
             duration INT(255) NOT NULL
         );";

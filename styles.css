@@ -57,6 +57,7 @@ body {
     align-items: center;
     height: 100%;
     margin: 0;
+    color: #13294b;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
@@ -138,13 +139,20 @@ hr {
     width: 70%;
 }
 
+input[type="textbox"], input[type="password"] {
+    margin: 10px;
+    height: 30px;
+    width: 80%;
+    text-align: center;
+    background-color: whitesmoke;
+}
+
 .instructions {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     text-align: left;
     font-weight: bold;
     list-style: circle;
     font-size: 25px;
-    
 }
 
 #login {
@@ -155,6 +163,19 @@ hr {
 
 #login_button {
     font-size: 18px;
+    width: 150px;
+}
+
+.login_card {
+    color: white;
+    background-color: #13294b;
+    border-radius: 10px;
+    margin-right: auto;
+    margin-left: auto;
+    width: 40%;
+    padding: 20px;
+    text-shadow: 3px 3px black;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
 #mascot {
