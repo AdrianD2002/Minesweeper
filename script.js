@@ -262,3 +262,51 @@ function StartGame(dimension, numMines) {
     game.MakeGrid();
     game.InitCells();
 }
+
+function Login() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText);
+                }
+            }
+        }
+        catch (e) {
+            console.log("LOGIN ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("POST",`login.php`);
+    httpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    httpRequest.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+}
+
+function Register() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText);
+                }
+            }
+        }
+        catch (e) {
+            console.log("REGISTER ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("POST",`register.php`);
+    httpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    httpRequest.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+}
