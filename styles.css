@@ -62,6 +62,8 @@ body {
 }
 
 button {
+    font-size: 18px;
+    width: 150px;
     padding: 10px 30px 10px 30px;
     margin: 10px auto 10px auto;
     background-color: #13294b;
@@ -123,16 +125,23 @@ h1 {
 }
 
 header {
-    display: block;
+    display: flex;
+    height: 110px;
+    vertical-align: middle;
     background: #c8102e;
-    text-align: center;
-    margin: 0px
 }
 
-header > a {
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
+header > img {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header_left {
+    margin-left: 5px;
+}
+
+.header_right {
+    margin-right: 5px;
 }
 
 hr {
@@ -155,17 +164,6 @@ input[type="textbox"], input[type="password"] {
     font-size: 25px;
 }
 
-#login {
-    position: absolute;
-    top: 5px;
-    right: 5px
-}
-
-#login_button {
-    font-size: 18px;
-    width: 150px;
-}
-
 .login_card {
     color: white;
     background-color: #13294b;
@@ -176,11 +174,6 @@ input[type="textbox"], input[type="password"] {
     padding: 20px;
     text-shadow: 3px 3px black;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-}
-
-#mascot {
-    position: absolute;
-    left: 10px;
 }
 
 .main_button {

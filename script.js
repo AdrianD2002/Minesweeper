@@ -37,7 +37,7 @@ class Cell {
     }
 
     SetIsMine(bool) {
-        console.log("SetIsMine " + bool);
+        //console.log("SetIsMine " + bool);
         this.#isMine = bool;
         if (bool) {
             //document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
@@ -151,7 +151,7 @@ class Minesweeper {
     }
 
     MakeGrid() {
-        console.log(this.dimension)
+        //console.log(this.dimension)
         let str = '<table id="board">';
 
         for (let i = 0; i < this.dimension; i++) { // height
@@ -161,7 +161,6 @@ class Minesweeper {
                     + 'id="' + i + ',' + j + '" '
                     + 'onclick="game.Dig(' + i + ',' + j + ',true)" '
                     + 'oncontextmenu="game.ToggleFlag(' + i + ', ' + j + ')">'
-                    //+ i + ',' + j
                     + '</td>';
             }
             str += '</tr>';
@@ -180,14 +179,14 @@ class Minesweeper {
             let row = [];
 
             for (let j = 0; j < this.dimension; j++) {
-                console.log(i,j)
+                //console.log(i,j)
                 let newCell = new Cell(i,j);
                 row.push(newCell);
             }
             this.listCells.push(row);
         }
 
-        console.log(this.listCells);
+        //console.log(this.listCells);
 
     }
 
