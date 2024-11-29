@@ -9,7 +9,7 @@
 
     // Check connection
     if ($conn->connect_error) {
-        die("[INIT] Connection Error: " . $conn->connect_error ."\n");
+        die("[INIT DB] Connection Error: " . $conn->connect_error ."\n");
     }
 
     // Check for existing database

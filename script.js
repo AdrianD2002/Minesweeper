@@ -237,6 +237,7 @@ function Init() {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     console.log(httpRequest.responseText);
+                    CheckLogin();
                 }
             }
         }
@@ -249,18 +250,38 @@ function Init() {
     httpRequest.send();
 }
 
-function GameInit() {
-    document.getElementById("gameDisplay").innerHTML =
-      '<h1>Select Difficulty</h1>'
-    + '<button type="button" onclick="StartGame(10,10)" class="main_button">Easy (10x10, 10 mines)</button><br>'
-    + '<button type="button" onclick="StartGame(18,50)" class="main_button">Medium (18x18, 50 mines)</button><br>'
-    + '<button type="button" onclick="StartGame(20,100)"class="main_button">Hard (20x20, 100 mines)</button><br>'
-}
+function CheckLogin() {
+    httpRequest = new XMLHttpRequest();
 
-function StartGame(dimension, numMines) {
-    game = new Minesweeper(dimension, numMines);
-    game.MakeGrid();
-    game.InitCells();
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText)
+                    let response = JSON.parse(httpRequest.responseText);
+
+                    if (response.isLoggedIn === "true") {
+                        document.getElementById("login_button").innerHTML = "Sign Out";
+                        document.getElementById("login_button").onclick = () => SignOut();
+                        document.getElementById("login").href = '#';
+                        //document.getElementById("username").innerHTML = response.username;
+                    }
+                    else {
+                        document.getElementById("login_button").innerHTML = "Log In";
+                        document.getElementById("login_button").onclick = null;
+                        document.getElementById("login").href = 'login.html';
+                        //document.getElementById("username").innerHTML = "";
+                    }
+                }
+            }
+        }
+        catch (e) {
+            console.log("LOGIN CHECK ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`check_login.php`);
+    httpRequest.send();
 }
 
 function Login() {
@@ -309,4 +330,48 @@ function Register() {
     httpRequest.open("POST",`register.php`);
     httpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
     httpRequest.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+}
+
+function SignOut() {
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    
+                    console.log(httpRequest.responseText)
+                    if (httpRequest.responseText === "true") {
+                        document.getElementById("login_button").innerHTML = "Log In";
+                        document.getElementById("login_button").onclick = null;
+                        document.getElementById("login").href = "login.html";
+                        //document.getElementById("username").innerHTML = '#';
+                    }
+                }
+            }
+        }
+        catch (e) {
+            console.log("SIGNOUT ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`sign_out.php`);
+    httpRequest.send();
+}
+
+
+function GameInit() {
+    Init();
+
+    document.getElementById("gameDisplay").innerHTML =
+      '<h1>Select Difficulty</h1>'
+    + '<button type="button" onclick="StartGame(10,10)" class="main_button">Easy (10x10, 10 mines)</button><br>'
+    + '<button type="button" onclick="StartGame(18,50)" class="main_button">Medium (18x18, 50 mines)</button><br>'
+    + '<button type="button" onclick="StartGame(20,100)"class="main_button">Hard (20x20, 100 mines)</button><br>'
+}
+
+function StartGame(dimension, numMines) {
+    game = new Minesweeper(dimension, numMines);
+    game.MakeGrid();
+    game.InitCells();
 }

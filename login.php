@@ -1,9 +1,11 @@
 <?php
+    session_start();
+
     $inputName = $_POST["username"];
     $inputPass = $_POST["password"];
 
     if ($inputName == null || $inputPass == null) {
-        die("[LOGIN] Login failed: null argument.\n");
+        die("[LOGIN] Failed: null argument.\n");
     }
 
     $servername = "localhost";
@@ -19,7 +21,7 @@
         die("[LOGIN] Connection Error: " . $conn->connect_error ."\n");
     }
 
-    $sql = "SELECT userName, userPass FROM Users WHERE userName = ? LIMIT 1;";
+    $sql = "SELECT id, userName, userPass FROM Users WHERE userName = ? LIMIT 1;";
 
     $stmt = $conn->prepare($sql);
 
@@ -35,14 +37,16 @@
         $record = $result->fetch_assoc();
     } 
     else {
-        die("[LOGIN]: Login failed; user not found.");
+        die("[LOGIN] Failed: user not found.");
     }
 
     if ($record["userPass"] == $inputPass) {
+        $_SESSION['userId'] = $record["id"];
+        $_SESSION['username'] = $record["userName"];
         echo "[LOGIN] Login successful.";
     }
     else {
-        echo "[LOGIN] Login failed; invalid password.";
+        echo "[LOGIN] Failed: invalid password.";
     }
 
     $stmt->close();
