@@ -264,12 +264,14 @@ function CheckLogin() {
                         document.getElementById("login_button").innerHTML = "Sign Out";
                         document.getElementById("login_button").onclick = () => SignOut();
                         document.getElementById("login").href = '#';
+                        document.getElementById("user_info").innerHTML = "Logged in as<br>" + response.username;
                         //document.getElementById("username").innerHTML = response.username;
                     }
                     else {
                         document.getElementById("login_button").innerHTML = "Log In";
                         document.getElementById("login_button").onclick = null;
                         document.getElementById("login").href = 'login.html';
+                        document.getElementById("user_info").innerHTML = "";
                         //document.getElementById("username").innerHTML = "";
                     }
                 }
@@ -295,6 +297,7 @@ function Login() {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     console.log(httpRequest.responseText);
+                    CheckLogin();
                 }
             }
         }
@@ -345,6 +348,7 @@ function SignOut() {
                         document.getElementById("login_button").innerHTML = "Log In";
                         document.getElementById("login_button").onclick = null;
                         document.getElementById("login").href = "login.html";
+                        document.getElementById("user_info").innerHTML = "";
                         //document.getElementById("username").innerHTML = '#';
                     }
                 }
