@@ -1,4 +1,6 @@
-let game;
+var game;
+var httpRequest;
+
 class Cell {
     x;
     y;
@@ -35,7 +37,7 @@ class Cell {
     }
 
     SetIsMine(bool) {
-        console.log("SetIsMine " + bool);
+        //console.log("SetIsMine " + bool);
         this.#isMine = bool;
         if (bool) {
             //document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
@@ -106,6 +108,7 @@ class Minesweeper {
         if (this.listCells[x][y].GetIsMine() && userInputted) { // User clicks a mine
             this.GameOver();
         }
+
         if (this.firstDig) {
             this.firstDig = false;
             this.firstDigCoords = [x,y];
@@ -129,6 +132,7 @@ class Minesweeper {
 
 
         if (this.listCells[x][y].GetAdjacentMines() != 0) {
+            this.listCells[x][y].DigCell();
             return;
         }
 
@@ -140,8 +144,6 @@ class Minesweeper {
 
                 // Skip column if the cell is against the left or right boundary
                 if (j < 0 || j > this.dimension - 1) { continue; }
-                // Skip if its the current cell
-                if (i == x && j == x) { continue; }
 
                 this.Dig(i,j,false);
             }
@@ -149,7 +151,7 @@ class Minesweeper {
     }
 
     MakeGrid() {
-        console.log(this.dimension)
+        //console.log(this.dimension)
         let str = '<table id="board">';
 
         for (let i = 0; i < this.dimension; i++) { // height
@@ -159,7 +161,6 @@ class Minesweeper {
                     + 'id="' + i + ',' + j + '" '
                     + 'onclick="game.Dig(' + i + ',' + j + ',true)" '
                     + 'oncontextmenu="game.ToggleFlag(' + i + ', ' + j + ')">'
-                    //+ i + ',' + j
                     + '</td>';
             }
             str += '</tr>';
@@ -178,14 +179,14 @@ class Minesweeper {
             let row = [];
 
             for (let j = 0; j < this.dimension; j++) {
-                console.log(i,j)
+                //console.log(i,j)
                 let newCell = new Cell(i,j);
                 row.push(newCell);
             }
             this.listCells.push(row);
         }
 
-        console.log(this.listCells);
+        //console.log(this.listCells);
 
     }
 
@@ -228,14 +229,150 @@ class Minesweeper {
     }
 }
 
+function Init() {
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText);
+                    CheckLogin();
+                }
+            }
+        }
+        catch (e) {
+            console.log("INIT ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`init_db.php`);
+    httpRequest.send();
+}
+
+function CheckLogin() {
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText)
+                    let response = JSON.parse(httpRequest.responseText);
+
+                    if (response.isLoggedIn === "true") {
+                        document.getElementById("login_button").innerHTML = "Sign Out";
+                        document.getElementById("login_button").onclick = () => SignOut();
+                        document.getElementById("login").href = '#';
+                        document.getElementById("user_info").innerHTML = "Logged in as<br>" + response.username;
+                        //document.getElementById("username").innerHTML = response.username;
+                    }
+                    else {
+                        document.getElementById("login_button").innerHTML = "Log In";
+                        document.getElementById("login_button").onclick = null;
+                        document.getElementById("login").href = 'login.html';
+                        document.getElementById("user_info").innerHTML = "";
+                        //document.getElementById("username").innerHTML = "";
+                    }
+                }
+            }
+        }
+        catch (e) {
+            console.log("LOGIN CHECK ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`check_login.php`);
+    httpRequest.send();
+}
+
+function Login() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText);
+                    CheckLogin();
+                }
+            }
+        }
+        catch (e) {
+            console.log("LOGIN ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("POST",`login.php`);
+    httpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    httpRequest.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+}
+
+function Register() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log(httpRequest.responseText);
+                }
+            }
+        }
+        catch (e) {
+            console.log("REGISTER ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("POST",`register.php`);
+    httpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    httpRequest.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+}
+
+function SignOut() {
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    
+                    console.log(httpRequest.responseText)
+                    if (httpRequest.responseText === "true") {
+                        document.getElementById("login_button").innerHTML = "Log In";
+                        document.getElementById("login_button").onclick = null;
+                        document.getElementById("login").href = "login.html";
+                        document.getElementById("user_info").innerHTML = "";
+                        //document.getElementById("username").innerHTML = '#';
+                    }
+                }
+            }
+        }
+        catch (e) {
+            console.log("SIGNOUT ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`sign_out.php`);
+    httpRequest.send();
+}
+
+
 function GameInit() {
+    Init();
+
     document.getElementById("gameDisplay").innerHTML =
       '<h1>Select Difficulty</h1>'
     + '<button type="button" onclick="StartGame(10,10)" class="main_button">Easy (10x10, 10 mines)</button><br>'
     + '<button type="button" onclick="StartGame(18,50)" class="main_button">Medium (18x18, 50 mines)</button><br>'
     + '<button type="button" onclick="StartGame(20,100)"class="main_button">Hard (20x20, 100 mines)</button><br>'
 }
-
 
 function StartGame(dimension, numMines) {
     game = new Minesweeper(dimension, numMines);

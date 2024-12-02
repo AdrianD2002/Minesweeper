@@ -7,14 +7,27 @@
         <link rel="stylesheet" href="styles.css"/>
         <link rel="icon" href="assets/mascot.ico" type="image/ico">
     </head>
-    <body>
+    <body onload="Init()">
         <header>
-            <a href="index.html"><img src="assets/mascot.png" height="100px" id="mascot"/></a>
-            <img src="assets/fs-logo-white.png" height = "100px" id="logo"/>
-            <a href="login.html" id="login"><button type="button" id="login_button">Log In</button></a>
+            <a href="index.html" class="header_left"><img src="assets/mascot.png" width="150px"/></a>
+            <img src="assets/fs-logo-white.png" height = "100px"/>
+            <div>
+                <a href="index.html" class="header_right"><button type="button">Home</button></a>
+                <p id="user_info"></p>
+            </div>
         </header>
         <div class="main">
-            
+            <h1>Login</h1>
+            <div class="login_card">
+                <h2>Please enter your username and password.</h2>
+                <input type="textbox" id="username" name="username" placeholder="Username"><br>
+                <input type="password" id="password" name="password" placeholder="Password">
+            </div>
+            <button type="button" onclick="Login()">Log In</button>
+            <button type="button" onclick="Register()">Register</button>
+            <br>
+
+            <span id="login_status"></span>
         </div>
         <footer>
             <p>Made by Adrian Dalena and Ian Wilson</p>
