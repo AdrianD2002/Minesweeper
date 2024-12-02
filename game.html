@@ -2,21 +2,20 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Minesweeper - Game</title>
+        <title>Playing Minesweeper</title>
         <script type="text/javascript" src="script.js"></script>
         <link rel="stylesheet" href="styles.css"/>
         <link rel="icon" href="assets/mascot.ico" type="image/ico">
     </head>
-    <body>
+    <body onload="GameInit()">
         <header>
             <a href="index.html" id="home"><button type="button" id="home_button">Home</button></a>
             <img src="assets/fs-logo-white.png" height = "100px" id="logo"/>
             <a href="login.html" id="login"><button type="button" id="login_button">Log In</button></a>
         </header>
         <div class="main">
-            <br>
-            <p>todo: implement the game.</p>
-            <img src="assets/placeholdergame.png" height = "500px"/>
+            <div id="gameDisplay">
+            </div>
         </div>
         <footer>
             <p>Made by Adrian Dalena and Ian Wilson</p>
