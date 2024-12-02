@@ -1,5 +1,7 @@
 var game;
 var httpRequest;
+var isLoggedIn = false;
+var leaderboardType = "global";
 
 class Cell {
     x;
@@ -65,6 +67,12 @@ class Minesweeper {
     firstDig = true;
     firstDigCoords;
     listCells = [];
+    timerStarted = false;
+    timeElapsed = 0; 
+    timerInterval = null; 
+    finalTime = null;
+    revealedCells = 0; 
+    nonMineCells = 0;
 
     constructor(dimension = 0, numMines = 0) {
         this.dimension = dimension;
@@ -72,20 +80,31 @@ class Minesweeper {
     }
 
     StartTimer() {
-        if(this.timerStarted = true) {
+        if (this.timerStarted) {
             return;
         }
-        
+
         this.timerStarted = true;
 
         this.timerInterval = setInterval(() => {
-            this.timerElapsed++;
-            document.getElementById('timer').textContent = this.timeElapsed;
+            this.timeElapsed++;
+            document.getElementById('timer').textContent = this.timeElapsed; // Update timer display
         }, 1000);
     }
 
+    StopTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+
     GameOver() {
+        this.finalTime = this.timeElapsed;
+        this.StopTimer();
+        this.finalTime = this.timeElapsed;
         new Audio('assets/fuse.ogg').play();
+        
 
         for (let i = 0; i < this.dimension; i++) {
             for (let j = 0; j < this.dimension; j++) {
@@ -96,7 +115,66 @@ class Minesweeper {
                 }
             }
         }
+
+        for (let i = 0; i < this.dimension; i++) { //Disable clicking on tiles after game ends
+            for (let j = 0; j < this.dimension; j++) {
+                const cell = document.getElementById(`${i},${j}`);
+                cell.onclick = null;          
+                cell.oncontextmenu = null;   
+            }
+        }
+
+        let str = 
+        '<h2>Game Over!</h2>'
+        + '<h3>Score: ' + this.finalTime + ' second(s)</h3>'
+        + '<h3>Difficulty: ';
+
+        if (this.dimension == 10) {
+            str += 'Easy';
+        }
+        else if (this.dimension == 18) {
+            str += 'Medium';
+        }
+        else {
+            str += 'Hard';
+        }
+
+        str += '</h3>'
+
+        document.getElementById("clock").innerHTML = str;
     }
+
+    Win() {
+        this.StopTimer(); // Stop the timer
+        this.finalTime = this.timeElapsed; 
+    
+        // Disable interactions for all cells
+        for (let i = 0; i < this.dimension; i++) {
+            for (let j = 0; j < this.dimension; j++) {
+                const cell = document.getElementById(`${i},${j}`);
+                cell.onclick = null;          
+                cell.oncontextmenu = null;   
+            }
+        }
+    
+        // Display a win message
+        let str = 
+            '<h2>You Win!</h2>' +
+            '<h3>Score: ' + this.finalTime + ' second(s)</h3>' +
+            '<h3>Difficulty: ';
+    
+        if (this.dimension == 10) {
+            str += 'Easy';
+        } else if (this.dimension == 18) {
+            str += 'Medium';
+        } else {
+            str += 'Hard';
+        }
+    
+        str += '</h3>';
+        document.getElementById("clock").innerHTML = str;
+    }
+    
 
     Dig(x,y,userInputted) {
         if (this.listCells[x][y].isFlagged && userInputted) { // Spot is flagged
@@ -107,6 +185,7 @@ class Minesweeper {
         }
         if (this.listCells[x][y].GetIsMine() && userInputted) { // User clicks a mine
             this.GameOver();
+            return;
         }
 
         if (this.firstDig) {
@@ -119,6 +198,8 @@ class Minesweeper {
         this.listCells[x][y].isFlagged = false;
         this.listCells[x][y].DigCell();
 
+        this.revealedCells++; 
+        
         if (!this.listCells[x][y].GetIsMine()) {
             if (userInputted) {
                 let url = 'assets/dig' + Math.floor(Math.random() * 4 + 1) + '.ogg'
@@ -148,9 +229,15 @@ class Minesweeper {
                 this.Dig(i,j,false);
             }
         }
+
+        // Check win condition
+        if (this.revealedCells === this.nonMineCells) {
+            this.Win();
+        }
     }
 
     MakeGrid() {
+        this.StopTimer();
         //console.log(this.dimension)
         let str = '<table id="board">';
 
@@ -166,10 +253,12 @@ class Minesweeper {
             str += '</tr>';
         }
 
-        document.getElementById("gameDisplay").innerHTML = `
-      <div id="clock">Time: <span id="timer">0</span> seconds</div>
-        ` + str + `
-    <button type="button" onclick="GameInit()" class="main_button">Change Difficulty</button>`;
+        str += '</table>'
+
+        document.getElementById("gameDisplay").innerHTML =
+        '<div id="clock">Time: <span id="timer">0</span> seconds</div>'
+        + str
+        +'<button type="button" onclick="GameInit()" class="main_button">Change Difficulty</button>';
 
     }    
 
@@ -261,6 +350,7 @@ function CheckLogin() {
                     let response = JSON.parse(httpRequest.responseText);
 
                     if (response.isLoggedIn === "true") {
+                        isLoggedIn = true;
                         document.getElementById("login_button").innerHTML = "Sign Out";
                         document.getElementById("login_button").onclick = () => SignOut();
                         document.getElementById("login").href = '#';
@@ -268,6 +358,7 @@ function CheckLogin() {
                         //document.getElementById("username").innerHTML = response.username;
                     }
                     else {
+                        isLoggedIn = false;
                         document.getElementById("login_button").innerHTML = "Log In";
                         document.getElementById("login_button").onclick = null;
                         document.getElementById("login").href = 'login.html';
@@ -376,6 +467,32 @@ function GameInit() {
 
 function StartGame(dimension, numMines) {
     game = new Minesweeper(dimension, numMines);
+    game.nonMineCells = dimension * dimension - numMines;
     game.MakeGrid();
     game.InitCells();
+}
+
+function InitLeaderboard() {
+    Init();
+    let leaderboard = document.getElementById("leaderboard_display");
+    leaderboardType = "global";
+
+    let str = '';
+
+    console.log(isLoggedIn);
+    if (isLoggedIn) {
+        str += '<button type="button" onclick="ToggleLeaderboard()">Your Stats</button>';
+    }
+
+    str += '<table><tr>'
+    + '<th>Player</th>'
+    + '<th>Best Time</th>'
+    + '<th>Games Won</th>'
+    + '<th>Games Played</th>'
+    + '<th>Total Time Played</th>'
+    + '</tr></table>';
+
+    console.log(str);
+
+    leaderboard.innerHTML = str;
 }
