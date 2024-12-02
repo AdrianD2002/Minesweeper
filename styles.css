@@ -124,6 +124,7 @@ h1 {
 
 header {
     display: block;
+    justify-content: center;
     background: #c8102e;
     text-align: center;
     margin: 0px
