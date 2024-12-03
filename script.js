@@ -454,9 +454,18 @@ function SignOut() {
     httpRequest.send();
 }
 
+function BackgroundMusic() {
+    const music = new Audio('assets/Minecraft.mp3'); 
+    music.loop = true;
+    music.volume = 0.25; 
+    music.play();
+}
+
 
 function GameInit() {
     Init();
+
+    BackgroundMusic();
 
     document.getElementById("gameDisplay").innerHTML =
       '<h1>Select Difficulty</h1>'
@@ -471,6 +480,8 @@ function StartGame(dimension, numMines) {
     game.MakeGrid();
     game.InitCells();
 }
+
+
 
 function InitLeaderboard() {
     Init();
