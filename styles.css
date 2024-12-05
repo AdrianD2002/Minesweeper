@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Minecraft";
+    src: url("assets/minecraft.ttf");
+}
+
 .author {
     display: flex;
     width: 70%;
@@ -47,6 +52,8 @@
     border: 1px dotted black;
     width: 25px;
     height: 25px;
+    font-family: 'Minecraft';
+    font-size: 22px;
     background-image: url("assets/grass.jpg");
     background-size: 25px;
     color: white;
