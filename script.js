@@ -2,6 +2,8 @@ var game;
 var httpRequest;
 var isLoggedIn = false;
 var leaderboardType = "global";
+var music;
+var playerId = -1;
 
 class Cell {
     x;
@@ -42,10 +44,10 @@ class Cell {
         //console.log("SetIsMine " + bool);
         this.#isMine = bool;
         if (bool) {
-            //document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
+            document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/stone.webp")'; // TODO: Remove when done debugging
         }
         else {
-            //document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/grass.jpg")'; // TODO: Remove when done debugging
+            document.getElementById(this.x + ',' + this.y).style = 'background-image: url("assets/grass.jpg")'; // TODO: Remove when done debugging
         }
         
     }
@@ -104,6 +106,8 @@ class Minesweeper {
         this.StopTimer();
         this.finalTime = this.timeElapsed;
         new Audio('assets/fuse.ogg').play();
+
+        StopBackgroundMusic();
         
 
         for (let i = 0; i < this.dimension; i++) {
@@ -142,11 +146,15 @@ class Minesweeper {
         str += '</h3>'
 
         document.getElementById("clock").innerHTML = str;
+        music.pause();
     }
 
     Win() {
         this.StopTimer(); // Stop the timer
         this.finalTime = this.timeElapsed; 
+        let Score = this.finalTime;
+        let Difficulty;
+        StopBackgroundMusic();
     
         // Disable interactions for all cells
         for (let i = 0; i < this.dimension; i++) {
@@ -160,19 +168,43 @@ class Minesweeper {
         // Display a win message
         let str = 
             '<h2>You Win!</h2>' +
-            '<h3>Score: ' + this.finalTime + ' second(s)</h3>' +
+            '<h3>Score: ' + Score + ' second(s)</h3>' +
             '<h3>Difficulty: ';
     
         if (this.dimension == 10) {
             str += 'Easy';
+            Difficulty = "Easy";
         } else if (this.dimension == 18) {
             str += 'Medium';
+            Difficulty = "Medium";
         } else {
             str += 'Hard';
+            Difficulty = "Hard";
         }
     
         str += '</h3>';
         document.getElementById("clock").innerHTML = str;
+
+        music = new Audio('assets/victory.ogg'); 
+        music.play();
+
+        if(isLoggedIn) {
+            console.log("[WIN] Saving game to database for player id: " + playerId);
+
+            httpRequest = new XMLHttpRequest();
+            httpRequest.open("POST", `submit_score.php`);
+            httpRequest.onreadystatechange = function () {
+                if(httpRequest.readyState === 4) {
+                    if(httpRequest.status === 200) {
+                        console.log(httpRequest.responseText);
+                    }
+                }
+            }
+            httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            httpRequest.send("Score=" + encodeURIComponent(Score) + "&Difficulty=" + encodeURIComponent(Difficulty) + "&PlayerID=" + encodeURIComponent(playerId));
+        }
+
+        
     }
     
 
@@ -214,7 +246,14 @@ class Minesweeper {
 
         if (this.listCells[x][y].GetAdjacentMines() != 0) {
             this.listCells[x][y].DigCell();
+            if (this.revealedCells === this.nonMineCells) {
+                this.Win();
+            }
             return;
+        }
+
+        if (this.revealedCells === this.nonMineCells) {
+            this.Win();
         }
 
         // Recursively dig adjacent cells with no adjacent mines
@@ -228,11 +267,6 @@ class Minesweeper {
 
                 this.Dig(i,j,false);
             }
-        }
-
-        // Check win condition
-        if (this.revealedCells === this.nonMineCells) {
-            this.Win();
         }
     }
 
@@ -258,7 +292,8 @@ class Minesweeper {
         document.getElementById("gameDisplay").innerHTML =
         '<div id="clock">Time: <span id="timer">0</span> seconds</div>'
         + str
-        +'<button type="button" onclick="GameInit()" class="main_button">Change Difficulty</button>';
+        +'<button type="button" onclick="GameInit()" class="main_button">Change Difficulty</button><br>'
+        +'<button type="button" onclick="StartGame(' + this.dimension + ',' + this.numMines + ')" class="main_button">Reset</button>';
 
     }    
 
@@ -351,18 +386,20 @@ function CheckLogin() {
 
                     if (response.isLoggedIn === "true") {
                         isLoggedIn = true;
+                        playerId = response.id;
+                        document.getElementById("user_info").innerHTML = "Logged in as<br>" + response.username;
                         document.getElementById("login_button").innerHTML = "Sign Out";
                         document.getElementById("login_button").onclick = () => SignOut();
                         document.getElementById("login").href = '#';
-                        document.getElementById("user_info").innerHTML = "Logged in as<br>" + response.username;
                         //document.getElementById("username").innerHTML = response.username;
                     }
                     else {
                         isLoggedIn = false;
+                        playerId = -1;
+                        document.getElementById("user_info").innerHTML = "";
                         document.getElementById("login_button").innerHTML = "Log In";
                         document.getElementById("login_button").onclick = null;
                         document.getElementById("login").href = 'login.html';
-                        document.getElementById("user_info").innerHTML = "";
                         //document.getElementById("username").innerHTML = "";
                     }
                 }
@@ -455,17 +492,23 @@ function SignOut() {
 }
 
 function BackgroundMusic() {
-    const music = new Audio('assets/Minecraft.mp3'); 
+    console.log("Starting Music.")
+    music = new Audio('assets/Minecraft.mp3'); 
     music.loop = true;
-    music.volume = 0.25; 
+    music.volume = 1.0; 
     music.play();
 }
 
+function StopBackgroundMusic() {
+    console.log("Stopping Music.")
+    if (music) {
+        music.pause();
+        music.currentTime = 0; 
+    }
+}
 
 function GameInit() {
     Init();
-
-    BackgroundMusic();
 
     document.getElementById("gameDisplay").innerHTML =
       '<h1>Select Difficulty</h1>'
@@ -475,13 +518,19 @@ function GameInit() {
 }
 
 function StartGame(dimension, numMines) {
+
+    if (game) {
+        console.log("Stopping timer for old game.");
+        game.StopTimer();
+        StopBackgroundMusic();
+    }
+
+    BackgroundMusic();
     game = new Minesweeper(dimension, numMines);
     game.nonMineCells = dimension * dimension - numMines;
     game.MakeGrid();
     game.InitCells();
 }
-
-
 
 function InitLeaderboard() {
     Init();

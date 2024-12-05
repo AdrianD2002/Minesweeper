@@ -37,7 +37,7 @@
         $sql .= "CREATE TABLE Games (
             id INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             playerID INT(10) NOT NULL,
-            difficulty INT(1) NOT NULL,
+            difficulty VARCHAR(255) NOT NULL,
             duration INT(255) NOT NULL
         );";
 
