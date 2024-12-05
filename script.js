@@ -484,12 +484,22 @@ function Register() {
 
     httpRequest = new XMLHttpRequest();
 
-    httpRequest.onreadystatechange = () => {
+    httpRequest.onreadystatechange = () => { //FIXME check how to have this present on the page.
         try {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     console.log(httpRequest.responseText);
-                }
+
+                    if (httpRequest.responseText == "[REGISTER]: Failed; user already exists." ) {
+                        alert("User already exists!");
+                    }
+                    else if (httpRequest.responseText == "[REGISTRATION] Successfully registered new account.") {
+                        alert("User registered!");
+                    }
+                    else if (httpRequest.responseText == "[REGISTRATION] Failed unexpectedly.") {
+                        alert("Registration failed unexpectedly.");
+                    }
+                } 
             }
         }
         catch (e) {
