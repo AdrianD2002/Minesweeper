@@ -9,7 +9,7 @@
 
     $sql = "SELECT 
             Users.userName AS playerName,
-            MIN(Games.duration) AS bestTime,
+            MIN(CASE WHEN Games.result = 'Win' THEN Games.duration ELSE NULL END) AS bestTime,
             SUM(CASE WHEN Games.result = 'Win' THEN 1 ELSE 0 END) AS gamesWon,
             COUNT(Games.id) AS totalGames,
             SUM(Games.duration) AS totalTimePlayed
@@ -22,6 +22,7 @@
     $stmt->execute();
     $result = $stmt->get_result();
 
+    $obj = [];
     $entries = [];
     while ($record = $result->fetch_assoc()) {
         $entries[] =  $record;
@@ -29,6 +30,7 @@
 
     echo json_encode($entries);
 
+    $stmt->close();
     $conn->close();
     
 ?>

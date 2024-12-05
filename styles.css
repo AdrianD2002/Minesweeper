@@ -187,6 +187,11 @@ input[type="textbox"], input[type="password"] {
     width: fit-content;
 }
 
+#leaderboard_display h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
 #leaderboard_display table {
     border: 1px solid black;
     border-collapse: collapse;
@@ -197,6 +202,7 @@ input[type="textbox"], input[type="password"] {
 #leaderboard_display table td {
     border: 1px solid black;
     width: 150px;
+    padding: 5px;
 }
 
 #leaderboard_display table th {

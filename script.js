@@ -1,6 +1,5 @@
 var game;
 var isLoggedIn = false;
-var leaderboardType = "global";
 var music;
 var playerId = -1;
 
@@ -104,6 +103,8 @@ class Minesweeper {
         this.finalTime = this.timeElapsed;
         this.StopTimer();
         this.finalTime = this.timeElapsed;
+        let Score = this.finalTime;
+        let Difficulty;
         new Audio('assets/fuse.ogg').play();
 
         StopBackgroundMusic();
@@ -131,21 +132,38 @@ class Minesweeper {
         '<h2>Game Over!</h2>'
         + '<h3>Score: ' + this.finalTime + ' second(s)</h3>'
         + '<h3>Difficulty: ';
-
+    
         if (this.dimension == 10) {
             str += 'Easy';
-        }
-        else if (this.dimension == 18) {
+            Difficulty = "Easy";
+        } else if (this.dimension == 18) {
             str += 'Medium';
-        }
-        else {
+            Difficulty = "Medium";
+        } else {
             str += 'Hard';
+            Difficulty = "Hard";
         }
 
         str += '</h3>'
 
         document.getElementById("clock").innerHTML = str;
         music.pause();
+
+        if(isLoggedIn) {
+            console.log("[LOSS] Saving game to database for player id: " + playerId);
+
+            let httpRequest = new XMLHttpRequest();
+            httpRequest.open("POST", `submit_score.php`);
+            httpRequest.onreadystatechange = function () {
+                if(httpRequest.readyState === 4) {
+                    if(httpRequest.status === 200) {
+                        console.log(httpRequest.responseText);
+                    }
+                }
+            }
+            httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            httpRequest.send("Score=" + encodeURIComponent(Score) + "&Difficulty=" + encodeURIComponent(Difficulty) + "&PlayerID=" + encodeURIComponent(playerId) + '&Result=Loss');
+        }
     }
 
     Win() {
@@ -206,7 +224,6 @@ class Minesweeper {
         
     }
     
-
     Dig(x,y,userInputted) {
         if (this.listCells[x][y].isFlagged && userInputted) { // Spot is flagged
             return;
@@ -353,6 +370,7 @@ class Minesweeper {
 }
 
 function Init(Callback) {
+    console.log("Init called");
     let httpRequest = new XMLHttpRequest();
 
     httpRequest.onreadystatechange = () => {
@@ -401,16 +419,21 @@ function CheckLogin(Callback) {
                         document.getElementById("login").href = 'login.html';
                         //document.getElementById("username").innerHTML = "";
                     }
+
+                    if (Callback) {
+                        Callback();
+                    }
                 }
             }
         }
         catch (e) {
             console.log("LOGIN CHECK ERROR: " + e)
+            if (Callback) {
+                Callback();
+            }
         }
 
-        if (Callback) {
-            Callback();
-        }
+
     }
 
     httpRequest.open("GET",`check_login.php`);
@@ -550,9 +573,9 @@ function StartGame(dimension, numMines) {
 }
 
 function InitLeaderboard() {
+    console.log("InitLeaderboard called");
     let callback = () => {
         let leaderboard = document.getElementById("leaderboard_display");
-        leaderboardType = "global";
         let str = '';
 
         console.log("Logged in: " + isLoggedIn);
@@ -562,15 +585,14 @@ function InitLeaderboard() {
 
         let arr;
 
-        httpRequest = new XMLHttpRequest();
+        let httpRequest = new XMLHttpRequest();
         httpRequest.onreadystatechange = () => {
             try {
                 if (httpRequest.readyState === XMLHttpRequest.DONE) {
                     if (httpRequest.status === 200) {
-                        console.log(httpRequest.responseText)
                         arr = JSON.parse(httpRequest.responseText);
 
-                        str += '<table><tr>'
+                        str += '<table id=""><tr>'
                         + '<th>Player</th>'
                         + '<th>Best Time</th>'
                         + '<th>Games Won</th>'
@@ -594,7 +616,7 @@ function InitLeaderboard() {
                 }
             }
             catch (e) {
-                console.log("SIGNOUT ERROR: " + e)
+                console.log("ERROR: " + e)
             }
         }
 
@@ -603,4 +625,68 @@ function InitLeaderboard() {
     }
 
     Init(callback);
+}
+
+function ToggleLeaderboard() {
+    console.log("ToggleLeaderboard called");
+    let leaderboard = document.getElementById("leaderboard_display");
+    let str = '';
+
+    str += '<button type="button" onclick="InitLeaderboard()">Global Stats</button>';
+
+    let arr;
+
+    httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = () => {
+        try {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    arr = JSON.parse(httpRequest.responseText);
+
+                    str += '<table id=""><tr>'
+                    + '<th>Player</th>'
+                    + '<th>Best Time</th>'
+                    + '<th>Games Won</th>'
+                    + '<th>Games Played</th>'
+                    + '<th>Total Time Played</th>'
+                    + '</tr>'
+                    + '<tr>'
+                    + '<td>' + arr[0][0]["playerName"] + '</td>'
+                    + '<td>' + arr[0][0]["bestTime"] + ' second(s)</td>'
+                    + '<td>' + arr[0][0]["gamesWon"] + '</td>'
+                    + '<td>' + arr[0][0]["totalGames"] + '</td>'
+                    + '<td>' + arr[0][0]["totalTimePlayed"] + ' second(s)</td>'
+                    + '</tr>'
+                    + '</table>'
+
+                    + '<h3>Game History</h3>'
+                    + '<table>'
+                    + '<tr>'
+                    + '<th>Game #</th>'
+                    + '<th>Difficulty</th>'
+                    + '<th>Result</th>'
+                    + '<th>Time</th>';
+                    + '</tr>'
+                    for (let i = arr[1].length - 1; i >= 0; i--) {
+                        str += '<tr>'
+                        + '<td>' + (i + 1) + '</td>'
+                        + '<td>' + arr[1][i]["difficulty"] + '</td>'
+                        + '<td>' + arr[1][i]["result"] + '</td>'
+                        + '<td>' + arr[1][i]["duration"] + ' second(s)</td>'
+                        + '</tr>' 
+                    }
+
+                    str += '</table>';
+                    leaderboard.innerHTML = str;
+                }
+            }
+        }
+        catch (e) {
+            console.log("ERROR: " + e)
+        }
+    }
+
+    httpRequest.open("GET",`get_curr_stats.php?playerId=${playerId}`);
+    httpRequest.send();
+
 }
