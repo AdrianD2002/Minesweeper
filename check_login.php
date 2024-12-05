@@ -8,6 +8,6 @@
         echo json_encode(["id" => $_SESSION['userId'], "isLoggedIn" => "true", "username" => $username]);
     }
     else {
-        echo json_encode(["isLoggedIn" => "false", "username" => "null"]);
+        echo json_encode(["id" => -1, "isLoggedIn" => "false", "username" => "null"]);
     }
 ?>

@@ -37,16 +37,17 @@
         $record = $result->fetch_assoc();
     } 
     else {
-        die("[LOGIN] Failed: user not found.");
+        echo json_encode(["success" => "-1", "msg" => "[LOGIN] User not found."]);
+        die();
     }
 
     if ($record["userPass"] == $inputPass) {
         $_SESSION['userId'] = $record["id"];
         $_SESSION['username'] = $record["userName"];
-        echo "[LOGIN] Login successful.";
+        echo json_encode(["success" => "1", "msg" => "[LOGIN] Login successful."]);
     }
     else {
-        echo "[LOGIN] Failed: invalid password.";
+        echo json_encode(["success" => "0", "msg" => "[LOGIN] Invalid Password."]);;
     }
 
     $stmt->close();
