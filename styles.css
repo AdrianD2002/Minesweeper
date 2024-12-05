@@ -50,10 +50,12 @@
 
 #board td {
     border: 1px dotted black;
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
     font-family: 'Minecraft';
     font-size: 22px;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
     background-image: url("assets/grass.jpg");
     background-size: 25px;
     color: white;
@@ -113,7 +115,9 @@ div {
 }
 
 .flag {
-    height:21px;
+    height:19px;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
 }
 
 footer {
