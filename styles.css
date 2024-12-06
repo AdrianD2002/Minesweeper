@@ -56,7 +56,6 @@
     font-size: 22px;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
-    background-image: url("assets/grass.jpg");
     background-size: 25px;
     color: white;
 }
@@ -108,6 +107,10 @@ button:active {
     transition:all 0.01s ease;
 }
 
+.cave {
+    background-image: url("assets/stone.jpg")
+}
+
 div {
     text-align: center;
     margin: 0px
@@ -115,9 +118,10 @@ div {
 }
 
 .flag {
-    height:19px;
+    height: 19px;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
+    vertical-align: middle;
 }
 
 footer {
@@ -241,6 +245,10 @@ input[type="textbox"], input[type="password"] {
     width: 30%;
 }
 
+.overworld {
+    background-image: url("assets/grass.jpg");
+}
+
 .th_button {
     font-size: 10px;
     width: 25px;
@@ -256,6 +264,34 @@ input[type="textbox"], input[type="password"] {
     text-shadow: none;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
+
+.theme_select {
+    margin-right: 10px;
+    margin-left:10px;
+}
+
+.theme_select:hover {
+    -webkit-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    transform: scale(1.1);
+    transition:all 0.3s ease;
+    cursor: pointer;
+}
+
+.theme_select:not(:hover) {
+    -webkit-transform: scale(1.0);
+    -ms-transform: scale(1.0);
+    transform: scale(1.0);
+    transition:all 0.3s ease;
+}
+
+.theme_select:active {
+    -webkit-transform: scale(1.0);
+    -ms-transform: scale(1.0);
+    transform: scale(1.0);
+    transition:all 0.01s ease;
+}
+
 
 #user_info {
     color: white;

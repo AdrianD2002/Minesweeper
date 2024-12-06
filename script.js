@@ -2,7 +2,8 @@ var game;
 var isLoggedIn = false;
 var music;
 var playerId = -1;
-var leaderboardSortOrder = "desc"
+var leaderboardSortOrder = "desc";
+var theme = "overworld";
 
 class Cell {
     x;
@@ -31,12 +32,19 @@ class Cell {
             return; 
         }
 
-        let url = 'assets/flag' + Math.floor(Math.random() * 4 + 1) + '.ogg'
-        new Audio(url).play();
-
         this.isFlagged = !this.isFlagged;
         const cell = document.getElementById(this.x + ',' + this.y);
-        cell.innerHTML = this.isFlagged ? '<img src="assets/flower' + Math.floor(Math.random() * 10 + 1) + '.png" alt="Flag" class="flag">' : '';
+
+        if (theme == "overworld") {
+            let url = 'assets/flag' + Math.floor(Math.random() * 4 + 1) + '.ogg'
+            new Audio(url).play();
+            cell.innerHTML = this.isFlagged ? '<img src="assets/flower' + Math.floor(Math.random() * 10 + 1) + '.png" alt="Flag" class="flag">' : '';
+        }
+        else if (theme == "cave") {
+            let url = 'assets/flag_cave' + Math.floor(Math.random() * 4 + 1) + '.ogg'
+            new Audio(url).play();
+            cell.innerHTML = this.isFlagged ? '<img src="assets/ore' + Math.floor(Math.random() * 8 + 1) + '.jpg" alt="Flag" class="flag">' : '';
+        }
 
         game.flagsLeft += this.isFlagged ? -1 : 1;
         game.UpdateNumFlags();
@@ -123,8 +131,14 @@ class Minesweeper {
             for (let j = 0; j < this.dimension; j++) {
                 if (this.listCells[i][j].GetIsMine()) {
                     const cell = document.getElementById(i + ',' + j);
-                    cell.style = 'background-image: url("assets/tnt.webp")'; // Show mine if the cell is a mine
-                    
+
+                    if (theme == "overworld") {
+                        cell.style = 'background-image: url("assets/tnt.webp")'; // Show mine if the cell is a mine
+                    }
+                    else if (theme == "cave") {
+                        cell.style = 'background-image: url("assets/creeper.png")'; // Show mine if the cell is a mine
+                        cell.innerHTML = '';
+                    }
                 }
             }
         }
@@ -235,7 +249,11 @@ class Minesweeper {
     }
     
     Dig(x,y,userInputted) {
-        if (this.listCells[x][y].isFlagged) {
+        if (this.listCells[x][y].isFlagged && userInputted) {
+            // Prevent player from digging a flagged cell
+            return; 
+        }
+        if (this.listCells[x][y].isFlagged && !userInputted) {
             // If it's flagged and part of a recursive dig, remove the flag and update the counter
             this.listCells[x][y].isFlagged = false;
             this.flagsLeft++;
@@ -264,11 +282,23 @@ class Minesweeper {
         
         if (!this.listCells[x][y].GetIsMine()) {
             if (userInputted) {
-                let url = 'assets/dig' + Math.floor(Math.random() * 4 + 1) + '.ogg'
-                new Audio(url).play(); 
+                if (theme == "overworld") {
+                    let url = 'assets/dig' + Math.floor(Math.random() * 4 + 1) + '.ogg'
+                    new Audio(url).play(); 
+                }
+                else if (theme == "cave") {
+                    let url = 'assets/flag_cave' + Math.floor(Math.random() * 4 + 1) + '.ogg'
+                    new Audio(url).play(); 
+                }
             }
             const cell = document.getElementById(x + ',' + y);
-            cell.style = 'background-image: url("assets/dirt.webp")';
+            
+            if (theme == "overworld") {
+                cell.style = 'background-image: url("assets/dirt.webp")';
+            }
+            else if (theme == "cave") {
+                cell.style = 'background-image: url("assets/cobble.jpg")';
+            }
             let adjacentMines = this.listCells[x][y].GetAdjacentMines();
             cell.innerHTML = adjacentMines == 0 ? '' : adjacentMines;
         }
@@ -311,8 +341,15 @@ class Minesweeper {
                 str += '<td '
                     + 'id="' + i + ',' + j + '" '
                     + 'onclick="game.Dig(' + i + ',' + j + ',true)" '
-                    + 'oncontextmenu="game.ToggleFlag(' + i + ', ' + j + ')">'
-                    + '</td>';
+                    + 'oncontextmenu="game.ToggleFlag(' + i + ', ' + j + ')" '
+
+                    if (theme == "overworld") {
+                        str += 'class="overworld"'
+                    }
+                    else if (theme == "cave") {
+                        str += 'class="cave"';
+                    }
+                str += '</td>';
             }
             str += '</tr>';
         }
@@ -564,7 +601,12 @@ function SignOut() {
 
 function BackgroundMusic() {
     console.log("Starting Music.")
-    music = new Audio('assets/Minecraft.mp3'); 
+    if (theme == "overworld") {
+        music = new Audio('assets/Minecraft.mp3'); 
+    }
+    else if (theme == "cave") {
+        music = new Audio('assets/cave.mp3'); 
+    }
     music.loop = true;
     music.volume = 1.0; 
     music.play();
@@ -587,6 +629,16 @@ function GameInit() {
     + '<button type="button" onclick="StartGame(10,10)" class="main_button">Easy (10x10, 10 mines)</button><br>'
     + '<button type="button" onclick="StartGame(18,50)" class="main_button">Medium (18x18, 50 mines)</button><br>'
     + '<button type="button" onclick="StartGame(20,100)"class="main_button">Hard (20x20, 100 mines)</button><br>'
+    + '<h2>Theme:</h2>'
+    + '<img src="assets/overworld.jpg" class="theme_select" height="100px" onclick="ThemeOverworld()" id="overworld">'
+    + '<img src="assets/stone.jpg" class="theme_select" height="100px" onclick="ThemeCave()" id="cave"><br>'
+
+    if (theme == "overworld") {
+        ThemeOverworld();
+    }
+    else if (theme == "cave") {
+        ThemeCave();
+    }
 }
 
 function StartGame(dimension, numMines) {
@@ -723,4 +775,18 @@ function ToggleLeaderboard() {
     httpRequest.open("GET",`get_curr_stats.php?playerId=${playerId}`);
     httpRequest.send();
 
+}
+
+function ThemeOverworld() {
+    document.getElementById("overworld").src = "assets/overworld_selected.jpg";
+    document.getElementById("cave").src = "assets/stone.jpg";
+    document.getElementById("game_body").style = "background-color: white;"
+    theme = "overworld";
+}
+
+function ThemeCave() {
+    document.getElementById("cave").src = "assets/cave_selected.jpg";
+    document.getElementById("overworld").src = "assets/overworld.jpg";
+    document.getElementById("game_body").style = "background-color: #6e6e6e;"
+    theme = "cave";
 }
