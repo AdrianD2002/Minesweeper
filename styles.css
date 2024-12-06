@@ -17,8 +17,8 @@
 }
 
 .author_desc h2 {
-    color: #13294b;
     text-decoration: underline;
+    text-decoration-color: #13294b;
 }
 
 .author_image {

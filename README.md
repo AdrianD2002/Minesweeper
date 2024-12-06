@@ -2,7 +2,6 @@
 A simple minesweeper website demonstration for our web development course.
 
 ## Installation and Usage
-This website demonstration can be tried with XAMPP running an Apache Server:
 1. If not done so already, [install XAMPP](https://www.apachefriends.org/)
 2. Locate your XAMPP install (typically C:/xampp/).
 3. Open the /htdocs/ folder and do either of the following:
@@ -11,7 +10,7 @@ This website demonstration can be tried with XAMPP running an Apache Server:
    
    b) If installing with the ZIP file, unzip the contents into /htdocs/Minesweeper.
 
-5. Run XAMPP and click "Start" for the Apache server.
-6. In your terminal, run the command "ipconfig" and locate your IPv4 address. Copy it.
-7. In your web browser, paste your IPv4 in the url followed by "/Minesweeper/index.html" and hit enter.
-8. You are now testing the website. Have fun!
+5. Run XAMPP and click "Start" for Apache and MySQL.
+6. Open the admin settings in MySQL. Create a new user with "csci130" for both the name and password, localhost, and click all privileges.
+7. In your web browser, enter "localhost/Data-Browser" in your URL field and hit enter.
+8. You should now be in the landing page of the minesweeper website. Have fun!

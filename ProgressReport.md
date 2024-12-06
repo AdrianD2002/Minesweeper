@@ -18,4 +18,4 @@ Beginning of database implementation and functionalities that used it. Both of u
 
 ## Week 5
 
-Continued database interaction handling. Adrian was responsible for leaderboard data query and presentation. (Ongoing)
+Continued database interaction handling. Adrian was responsible for leaderboard data query and presentation. Ian was responsible for polishing up the remaining game mechanics and bugs.
