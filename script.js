@@ -2,6 +2,7 @@ var game;
 var isLoggedIn = false;
 var music;
 var playerId = -1;
+var leaderboardSortOrder = "desc"
 
 class Cell {
     x;
@@ -26,12 +27,19 @@ class Cell {
             return;
         }
 
+        if (!this.isFlagged && game.flagsLeft <= 0) { // Don't allow negative flags
+            return; 
+        }
+
         let url = 'assets/flag' + Math.floor(Math.random() * 4 + 1) + '.ogg'
         new Audio(url).play();
 
         this.isFlagged = !this.isFlagged;
         const cell = document.getElementById(this.x + ',' + this.y);
         cell.innerHTML = this.isFlagged ? '<img src="assets/flower' + Math.floor(Math.random() * 10 + 1) + '.png" alt="Flag" class="flag">' : '';
+
+        game.flagsLeft += this.isFlagged ? -1 : 1;
+        game.UpdateNumFlags();
     }
 
     GetIsMine() {
@@ -77,6 +85,7 @@ class Minesweeper {
     constructor(dimension = 0, numMines = 0) {
         this.dimension = dimension;
         this.numMines = numMines;
+        this.flagsLeft = numMines;
     }
 
     StartTimer() {
@@ -166,6 +175,7 @@ class Minesweeper {
         }
     }
 
+
     Win() {
         this.StopTimer(); // Stop the timer
         this.finalTime = this.timeElapsed; 
@@ -225,8 +235,12 @@ class Minesweeper {
     }
     
     Dig(x,y,userInputted) {
-        if (this.listCells[x][y].isFlagged && userInputted) { // Spot is flagged
-            return;
+        if (this.listCells[x][y].isFlagged) {
+            // If it's flagged and part of a recursive dig, remove the flag and update the counter
+            this.listCells[x][y].isFlagged = false;
+            this.flagsLeft++;
+            this.UpdateNumFlags();
+            return; 
         }
         if (this.listCells[x][y].isRevealed) { // Spot is already revealed
             return;
@@ -307,6 +321,7 @@ class Minesweeper {
 
         document.getElementById("gameDisplay").innerHTML =
         '<div id="clock">Time: <span id="timer">0</span> seconds</div>'
+        + '<div id="flagsLeft">Flags Left: ' + this.flagsLeft + '</div>'
         + str
         +'<button type="button" onclick="GameInit()" class="main_button">Change Difficulty</button><br>'
         +'<button type="button" onclick="StartGame(' + this.dimension + ',' + this.numMines + ')" class="main_button">Reset</button>';
@@ -366,6 +381,13 @@ class Minesweeper {
         this.StartTimer();
         event.preventDefault();
         this.listCells[x][y].ToggleFlag();
+    }
+
+    UpdateNumFlags() {
+        const flagCounter = document.getElementById('flagsLeft');
+        if (flagCounter) {
+            flagCounter.textContent = `Flags left: ${this.flagsLeft}`;
+        }
     }
 }
 
@@ -582,8 +604,9 @@ function StartGame(dimension, numMines) {
     game.InitCells();
 }
 
-function InitLeaderboard() {
+function InitLeaderboard(sortBy) {
     console.log("InitLeaderboard called");
+
     let callback = () => {
         let leaderboard = document.getElementById("leaderboard_display");
         let str = '';
@@ -601,22 +624,23 @@ function InitLeaderboard() {
                 if (httpRequest.readyState === XMLHttpRequest.DONE) {
                     if (httpRequest.status === 200) {
                         arr = JSON.parse(httpRequest.responseText);
+                        leaderboardSortOrder = leaderboardSortOrder == 'asc' ? 'desc' : 'asc';
 
                         str += '<table id=""><tr>'
                         + '<th>Player</th>'
-                        + '<th>Best Time</th>'
-                        + '<th>Games Won</th>'
-                        + '<th>Games Played</th>'
-                        + '<th>Total Time Played</th>'
+                        + '<th>Best Time <button onclick=InitLeaderboard("bestTime") class="th_button">↕</button></th>'
+                        + '<th>Games Won <button onclick=InitLeaderboard("gamesWon") class="th_button">↕</button></th>'
+                        + '<th>Games Played <button onclick=InitLeaderboard("gamesPlayed") class="th_button">↕</button></th>'
+                        + '<th>Total Time Played <button onclick=InitLeaderboard("totalTime") class="th_button">↕</button></th>'
                         + '</tr>';
 
                         for (let i = 0; i < arr.length; i++) {
                             str += '<tr>'
                             + '<td>' + arr[i]["playerName"] + '</td>'
-                            + '<td>' + arr[i]["bestTime"] + ' second(s)</td>'
+                            + '<td>' + (arr[i]["bestTime"] == 2147483647 ? 'N/A' : arr[i]["bestTime"] + ' second(s)</td>')
                             + '<td>' + arr[i]["gamesWon"] + '</td>'
                             + '<td>' + arr[i]["totalGames"] + '</td>'
-                            + '<td>' + arr[i]["totalTimePlayed"] + ' second(s)</td>'
+                            + '<td>' + (arr[i]["totalTimePlayed"] == null ? '0' : arr[i]["totalTimePlayed"]) + ' second(s)</td>'
                             + '</tr>';
                         }
 
@@ -630,7 +654,7 @@ function InitLeaderboard() {
             }
         }
 
-        httpRequest.open("GET","get_leaderboard.php");
+        httpRequest.open("GET",`get_leaderboard.php?sort=${sortBy}&order=${leaderboardSortOrder}`);
         httpRequest.send();
     }
 
@@ -662,10 +686,10 @@ function ToggleLeaderboard() {
                     + '</tr>'
                     + '<tr>'
                     + '<td>' + arr[0][0]["playerName"] + '</td>'
-                    + '<td>' + arr[0][0]["bestTime"] + ' second(s)</td>'
+                    + '<td>' + (arr[0][0]["bestTime"] == 2147483647 ? 'N/A' : arr[0][0]["bestTime"] + ' second(s)</td>')
                     + '<td>' + arr[0][0]["gamesWon"] + '</td>'
                     + '<td>' + arr[0][0]["totalGames"] + '</td>'
-                    + '<td>' + arr[0][0]["totalTimePlayed"] + ' second(s)</td>'
+                    + '<td>' + (arr[0][0]["totalTimePlayed"] == null ? '0' : arr[0][0]["totalTimePlayed"]) + ' second(s)</td>'
                     + '</tr>'
                     + '</table>'
 

@@ -9,17 +9,16 @@
 
     $conn->select_db('minesweeper');
 
-    $sql = "SELECT 
-                Users.userName AS playerName,
-                MIN(CASE WHEN Games.result = 'Win' THEN Games.duration ELSE NULL END) AS bestTime,
-                SUM(CASE WHEN Games.result = 'Win' THEN 1 ELSE 0 END) AS gamesWon,
-                COUNT(Games.id) AS totalGames,
-                SUM(Games.duration) AS totalTimePlayed
+    $sql = "SELECT
+            Users.userName AS playerName,
+            MIN(CASE WHEN Games.result = 'Win' THEN Games.duration ELSE 2147483647 END) AS bestTime,
+            SUM(CASE WHEN Games.result = 'Win' THEN 1 ELSE 0 END) AS gamesWon,
+            COUNT(Games.id) AS totalGames,
+            SUM(Games.duration) AS totalTimePlayed
             FROM Users
             LEFT JOIN Games ON Users.id = Games.playerId
             WHERE Users.id = ?
-            GROUP BY Users.id
-    ";
+            GROUP BY Users.id";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i",$id);
